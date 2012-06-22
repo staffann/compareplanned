@@ -85,6 +85,15 @@ namespace CompareView
         public const string PlannedName = "PlannedName";
         public const string PlannedCategory = "PlannedCategory";
 
+        public const string PlannedAvgSpeed = "PlannedAverageSpeedMetersPerSecond";
+        public const string PlannedAvgPace = "PlannedAvgPace";
+        public const string PlannedAvgHR = "PlannedAverageHeartRate";
+        public const string PlannedAvgCad = "PlannedAverageCadence";
+        public const string PlannedAvgPower = "PlannedAveragePower";
+
+        public const string TimeDiff = "TimeDiff";
+        public const string DistanceDiff = "DistanceMetersDiff";
+
         //public const string MaxSpeed = "FastestSpeedMetersPerSecond";
         //public const string MaxPace = "MaxPace";
         //public const string MaxHR = "MaximumHeartRate";
@@ -119,6 +128,13 @@ namespace CompareView
             columnDefs.Add(new CompareTreeListColumnDefinition(CompareColumnIds.PlannedDistanceMeters, Resources.Planned + " " + CommonResources.Text.LabelDistance, "", 70, StringAlignment.Near));
             columnDefs.Add(new CompareTreeListColumnDefinition(CompareColumnIds.PlannedName, Resources.Planned + " " + CommonResources.Text.LabelName, "", 150, StringAlignment.Near));
             columnDefs.Add(new CompareTreeListColumnDefinition(CompareColumnIds.PlannedCategory, Resources.Planned + " " + CommonResources.Text.LabelCategory, "", 100, StringAlignment.Near));
+            columnDefs.Add(new CompareTreeListColumnDefinition(CompareColumnIds.PlannedAvgSpeed, Resources.Planned + " " + CommonResources.Text.LabelAvgSpeed, "", 70, StringAlignment.Near));
+            columnDefs.Add(new CompareTreeListColumnDefinition(CompareColumnIds.PlannedAvgPace, Resources.Planned + " " + CommonResources.Text.LabelAvgPace, "", 70, StringAlignment.Near));
+            columnDefs.Add(new CompareTreeListColumnDefinition(CompareColumnIds.PlannedAvgHR, Resources.Planned + " " + CommonResources.Text.LabelAvgHR, "", 70, StringAlignment.Near));
+            columnDefs.Add(new CompareTreeListColumnDefinition(CompareColumnIds.PlannedAvgCad, Resources.Planned + " " + CommonResources.Text.LabelAvgCadence, "", 70, StringAlignment.Near));
+            columnDefs.Add(new CompareTreeListColumnDefinition(CompareColumnIds.PlannedAvgPower, Resources.Planned + " " + CommonResources.Text.LabelAvgPower, "", 70, StringAlignment.Near));
+            columnDefs.Add(new CompareTreeListColumnDefinition(CompareColumnIds.TimeDiff, Resources.Diff + " " + CommonResources.Text.LabelTime, "", 70, StringAlignment.Near));
+            columnDefs.Add(new CompareTreeListColumnDefinition(CompareColumnIds.DistanceDiff, Resources.Diff + " " + CommonResources.Text.LabelDistance, "", 70, StringAlignment.Near));
 
             return columnDefs;
         }

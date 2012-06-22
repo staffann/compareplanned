@@ -4,4 +4,8 @@
     <StartAction>Program</StartAction>
     <StartProgram>C:\Program Files (x86)\Zone Five Software\SportTracks 3\SportTracks.exe</StartProgram>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <StartAction>Program</StartAction>
+    <StartProgram>C:\Program Files (x86)\Zone Five Software\SportTracks 3\SportTracks.exe</StartProgram>
+  </PropertyGroup>
 </Project>

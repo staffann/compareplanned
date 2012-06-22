@@ -61,6 +61,15 @@ namespace CompareView.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Diff.
+        /// </summary>
+        internal static string Diff {
+            get {
+                return ResourceManager.GetString("Diff", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Planned.
         /// </summary>
         internal static string Planned {
