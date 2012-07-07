@@ -161,6 +161,7 @@ namespace CompareView
                 // Enter planned and actual activities into TreeNodes
                 m_CVTreeListNodes.Clear();
                 List<IActivity> activities = new List<IActivity>(Plugin.GetApplication().Logbook.Activities);
+                List<DateTime> allActivityDates = new List<DateTime>(); //Used to highlight the dates of all activites in the ST calendar
                 activities.Sort(new ActivityComparer());
                 CVTreeListEntry entry = null;
                 while (activities.Count > 0)
@@ -183,11 +184,13 @@ namespace CompareView
                     else
                         entry.Activity = activities[0];
                     
+                    allActivityDates.Add(entry.Date);
                     activities.RemoveAt(0);
                 }
                 if (entry != null)
                     m_CVTreeListNodes.Add(new TreeList.TreeListNode(null, entry));
-                
+                Plugin.GetApplication().Calendar.SetHighlightedDates(allActivityDates); //Show the dates of all activities in the ST calendar
+
                 //If chosen, create daily groups
                 if (Settings.boGroupDaily)
                 {
