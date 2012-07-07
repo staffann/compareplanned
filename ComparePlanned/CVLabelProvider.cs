@@ -1,4 +1,20 @@
-﻿using System;
+﻿/*
+Copyright (C) 2012 Staffan Nilsson
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 3 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+using System;
 using System.Collections.Generic;
 using System.Text;
 using ZoneFiveSoftware.Common.Visuals;
@@ -110,11 +126,6 @@ namespace CompareView
                 else
                 {
                     // Don't duplicate how to show info - call this function back instead as if it was a performed activity
-                    //CVTreeListEntry plannedEntry = new CVTreeListEntry();
-                    //plannedEntry.Date = entry.Date;
-                    //plannedEntry.Activity = entry.PlannedActivity;
-                    //plannedEntry.PlannedActivity = null;
-                    //TreeList.TreeListNode plannedNode = new TreeList.TreeListNode(null, plannedEntry);
                     TreeList.TreeListNode plannedNode = TransformPlannedToActual(node, (TreeList.TreeListNode)node.Parent);
                     return GetText(plannedNode, new TreeList.Column(column.Id.Replace("Planned", "")));
                 }
@@ -131,28 +142,6 @@ namespace CompareView
                 else
                     return Length.Convert(distanceMeters.Value, Length.Units.Meter, Length.Units.Kilometer).ToString("0.00");
 
-                //// If the node has children, sum the distance of all the children
-                //if (node.Children.Count > 0)
-                //{
-                //    distanceMeters = 0;
-                //    foreach (TreeList.TreeListNode child in node.Children)
-                //    {
-                //        CVTreeListEntry childEntry = (CVTreeListEntry)child.Element;
-                //        if (childEntry.Activity != null)
-                //            distanceMeters += ActivityInfoCache.Instance.GetInfo(childEntry.Activity).DistanceMeters;
-                //    }
-                //}
-                //else if (entry.Activity != null)
-                //{
-                //    distanceMeters = ActivityInfoCache.Instance.GetInfo(entry.Activity).DistanceMeters;
-                //}
-                //else
-                //    return "";
-
-                ////return Length.Convert(ActivityInfoCache.Instance.GetInfo(entry.Activity).DistanceMeters, 
-                ////                        Length.Units.Meter, 
-                ////                        Length.Units.Kilometer).ToString("0.00");
-                //return Length.Convert(distanceMeters, Length.Units.Meter, Length.Units.Kilometer).ToString("0.00");
             }
             else if (column.Id.Equals("Time"))
             {
@@ -168,32 +157,7 @@ namespace CompareView
                     else
                         time = time.Value.Add(TimeSpan.FromMilliseconds(1000 - time.Value.Milliseconds));
                     return time.ToString();
-                }
-                    
-                //// If the node has children, sum the distance of all the children
-                //if (node.Children.Count > 0)
-                //{
-                //    foreach (TreeList.TreeListNode child in node.Children)
-                //    {
-                //        CVTreeListEntry childEntry = (CVTreeListEntry)child.Element;
-                //        if (childEntry.Activity != null)
-                //            time = time.Add(ActivityInfoCache.Instance.GetInfo(childEntry.Activity).Time);
-                //    }
-                //}
-                //else if (entry.Activity != null)
-                //{
-                //    time = ActivityInfoCache.Instance.GetInfo(entry.Activity).Time;
-                //}
-                //else
-                //    return "";
-
-                //// Round time to full second, ToString in .Net 2.0 doesn not have use a format string.
-                //// Rounding not always correct for exactly 0.5s but who cares...
-                //if (time.Milliseconds <= 500)
-                //    time = time.Subtract(TimeSpan.FromMilliseconds(time.Milliseconds));
-                //else
-                //    time = time.Add(TimeSpan.FromMilliseconds(1000 - time.Milliseconds));
-                //return time.ToString();
+                }                    
 
             }
             else if (column.Id.Equals(CompareColumnIds.TimeDiff))

@@ -1,4 +1,20 @@
-﻿using System;
+﻿/*
+Copyright (C) 2012 Staffan Nilsson
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 3 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -19,8 +35,7 @@ namespace CompareView
     public partial class CompareViewControl : UserControl
     {
         ITheme m_visualTheme;
-        //List<CVTreeListEntry> m_CVTreeListEntries = new List<CVTreeListEntry>();
-        List<TreeList.TreeListNode> m_CVTreeListNodes = new List<TreeList.TreeListNode>();
+        List<TreeList.TreeListNode> m_CVTreeListNodes = new List<TreeList.TreeListNode>(); // The top nodes to in the TreeList.
 
         Guid ActivityReportsViewGuid = new Guid("99498256-cf51-11db-9705-005056c00008");
         Guid DailyActivityViewGuid = new Guid("1dc82ca0-88aa-45a5-a6c6-c25f56ad1fc3"); 
@@ -96,25 +111,11 @@ namespace CompareView
         {
             InitializeComponent();
 
-            //TreeList.Column column = new TreeList.Column("StartTime", CommonResources.Text.LabelDate, 100, StringAlignment.Near);
-            //CompareTreeList.Columns.Add(column);
-            //column = new TreeList.Column("Time", CommonResources.Text.LabelTime, 70, StringAlignment.Near);
-            //CompareTreeList.Columns.Add(column);
-            //column = new TreeList.Column("DistanceMeters", CommonResources.Text.LabelDistance, 70, StringAlignment.Near);
-            //CompareTreeList.Columns.Add(column);
-
-            //column = new TreeList.Column("PlannedTime", Resources.Planned + " " + CommonResources.Text.LabelTime, 70, StringAlignment.Near);
-            //CompareTreeList.Columns.Add(column);
-            //column = new TreeList.Column("PlannedDistanceMeters", Resources.Planned + " " + CommonResources.Text.LabelDistance, 70, StringAlignment.Near);
-            //CompareTreeList.Columns.Add(column);
-            
-            //CompareTreeList.CheckBoxes = true;
             RefreshColumns();
             CompareTreeList.RowDataRenderer.RowAlternatingColors = true;
             CompareTreeList.LabelProvider = new CVLabelProvider();
 
             Plugin.GetApplication().Calendar.SelectedChanged += new EventHandler(CalenderDateChangedEventHandler);
-            //CompareTreeList.CheckedChanged += new TreeList.ItemEventHandler(treeView_CheckedChanged);
             //Plugin.GetApplication().Logbook.Activities.CollectionChanged += new NotifyCollectionChangedEventHandler<IActivity>(UpdateControlEventHandler);
 
         }
@@ -125,8 +126,7 @@ namespace CompareView
 
             this.CompareTreeList.ThemeChanged(visualTheme);
             //Non ST controls
-            //this.panelAct.BackColor = visualTheme.Control;
-            //this.panel3.BackColor = visualTheme.Control;
+            //example: this.panelAct.BackColor = visualTheme.Control;
             this.BackColor = visualTheme.Control;
         }
 
@@ -158,7 +158,7 @@ namespace CompareView
 
             if (Plugin.GetApplication().Logbook != null)
             {
-                // Enter planned and actual activities into appropriate row elements
+                // Enter planned and actual activities into TreeNodes
                 m_CVTreeListNodes.Clear();
                 List<IActivity> activities = new List<IActivity>(Plugin.GetApplication().Logbook.Activities);
                 activities.Sort(new ActivityComparer());
@@ -191,7 +191,6 @@ namespace CompareView
                 //If chosen, create daily groups
                 if (Settings.boGroupDaily)
                 {
-                    //List<CVTreeListEntry> entries = new List<CVTreeListEntry>(CVTreeListEntries);
                     List<TreeList.TreeListNode> nodes = new List<TreeList.TreeListNode>(m_CVTreeListNodes);
                     m_CVTreeListNodes.Clear();
                     CVTreeListEntry dayEntry = null; //entry for the top node containing the week
@@ -214,7 +213,7 @@ namespace CompareView
                             dayEntry = new CVTreeListEntry();
 
                             dayEntry.Date = entry.Date;
-                            //dayEntry.Date = entries[0].Date; //TODO: Enter the first day of the week here instead!
+
                             node = new TreeList.TreeListNode(null, dayEntry);
                         }
                         nodes[0].Parent = node;
@@ -225,11 +224,10 @@ namespace CompareView
                         m_CVTreeListNodes.Add(node);
                 }
 
+                //If chosen, create weekly groups
                 if (Settings.boGroupWeekly)
                 {
-                    // Create weekly groups
                     List<TreeList.TreeListNode> nodes = new List<TreeList.TreeListNode>(m_CVTreeListNodes);
-                    //List<CVTreeListEntry> entries = new List<CVTreeListEntry>(CVTreeListEntries);
                     m_CVTreeListNodes.Clear();
                     CVTreeListEntry wkEntry = null; //entry for the top node containing the week
                     entry = null; //entry for the child node containing the individual workouts
@@ -252,7 +250,6 @@ namespace CompareView
                             wkEntry = new CVTreeListEntry();
 
                             wkEntry.Date = GetFirstDayOfWeek(entry.Date);
-                            //dayEntry.Date = entries[0].Date; //TODO: Enter the first day of the week here instead!
                             node = new TreeList.TreeListNode(null, wkEntry);
                         }
                         nodes[0].Parent = node;
@@ -267,28 +264,10 @@ namespace CompareView
                 CompareTreeList.RowData = m_CVTreeListNodes;
                 if (Settings.boExpanded)
                     ExpandAllMenuItem_Click(null, null);
-                //CompareTreeList.Expanded = m_CVTreeListNodes;
 
                 DateTime calenderDT = Plugin.GetApplication().Calendar.Selected;
                 ShowBestEntryForDate(m_CVTreeListNodes, calenderDT);
 
-                //// Use ST calender as a base to know what date the user is interested in
-                //DateTime calenderDT = Plugin.GetApplication().Calendar.Selected;
-                //for (int i = m_CVTreeListNodes.Count - 1; i >= 0; i--)
-                //{
-                //    TreeList.TreeListNode tn = m_CVTreeListNodes[i];
-                //    if (tn.Element != null)
-                //    {
-                //        entry = (CVTreeListEntry)tn.Element;
-                //        if (entry.Date.CompareTo(calenderDT) <= 0)
-                //        {
-                //            CompareTreeList.Expanded = new List<TreeList.TreeListNode>(new TreeList.TreeListNode[] {tn});
-                //            CompareTreeList.SelectedItems = new List<TreeList.TreeListNode>(new TreeList.TreeListNode[] { tn });
-                //            CompareTreeList.EnsureVisible(tn);
-                //            break;
-                //        }
-                //    }
-                //}
             }
         }
 
@@ -461,14 +440,12 @@ namespace CompareView
         {
             Settings.boGroupWeekly = !Settings.boGroupWeekly;
             UpdateData();
-            //this.Refresh();
         }
 
         private void DailyGroupMenuItem_Click(object sender, EventArgs e)
         {
             Settings.boGroupDaily = !Settings.boGroupDaily;
             UpdateData();
-            //this.Refresh();
         }
 
         private void GroupMenuItem_DropDownOpening(object sender, EventArgs e)
