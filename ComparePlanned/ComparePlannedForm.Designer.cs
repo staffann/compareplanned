@@ -44,6 +44,9 @@
             this.SendPlannedToOverlayMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.SendPerformedToOverlayMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.SendAllToOverlayMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.GroupMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.WeeklyGroupMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.DailyGroupMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.MainSplitContainer.Panel1.SuspendLayout();
             this.MainSplitContainer.Panel2.SuspendLayout();
             this.MainSplitContainer.SuspendLayout();
@@ -122,12 +125,13 @@
             // 
             this.CompareTLMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.TableSettingsMenuItem,
+            this.GroupMenuItem,
             this.ExpandAllMenuItem,
             this.CollapseAllMenuItem,
             this.GoToMenuItem,
             this.SendToOverlayMenuItem});
             this.CompareTLMenuStrip.Name = "CompareTLMenuStrip";
-            this.CompareTLMenuStrip.Size = new System.Drawing.Size(158, 136);
+            this.CompareTLMenuStrip.Size = new System.Drawing.Size(158, 158);
             this.CompareTLMenuStrip.Opening += new System.ComponentModel.CancelEventHandler(this.CompareTLMenuStrip_Opening);
             // 
             // TableSettingsMenuItem
@@ -187,23 +191,47 @@
             // SendPlannedToOverlayMenuItem
             // 
             this.SendPlannedToOverlayMenuItem.Name = "SendPlannedToOverlayMenuItem";
-            this.SendPlannedToOverlayMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.SendPlannedToOverlayMenuItem.Size = new System.Drawing.Size(130, 22);
             this.SendPlannedToOverlayMenuItem.Text = "Planned";
             this.SendPlannedToOverlayMenuItem.Click += new System.EventHandler(this.SendToOverlayMenuItem_Click);
             // 
             // SendPerformedToOverlayMenuItem
             // 
             this.SendPerformedToOverlayMenuItem.Name = "SendPerformedToOverlayMenuItem";
-            this.SendPerformedToOverlayMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.SendPerformedToOverlayMenuItem.Size = new System.Drawing.Size(130, 22);
             this.SendPerformedToOverlayMenuItem.Text = "Performed";
             this.SendPerformedToOverlayMenuItem.Click += new System.EventHandler(this.SendToOverlayMenuItem_Click);
             // 
             // SendAllToOverlayMenuItem
             // 
             this.SendAllToOverlayMenuItem.Name = "SendAllToOverlayMenuItem";
-            this.SendAllToOverlayMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.SendAllToOverlayMenuItem.Size = new System.Drawing.Size(130, 22);
             this.SendAllToOverlayMenuItem.Text = "All";
             this.SendAllToOverlayMenuItem.Click += new System.EventHandler(this.SendToOverlayMenuItem_Click);
+            // 
+            // GroupMenuItem
+            // 
+            this.GroupMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.WeeklyGroupMenuItem,
+            this.DailyGroupMenuItem});
+            this.GroupMenuItem.Name = "GroupMenuItem";
+            this.GroupMenuItem.Size = new System.Drawing.Size(157, 22);
+            this.GroupMenuItem.Text = "Group";
+            this.GroupMenuItem.DropDownOpening += new System.EventHandler(this.GroupMenuItem_DropDownOpening);
+            // 
+            // WeeklyGroupMenuItem
+            // 
+            this.WeeklyGroupMenuItem.Name = "WeeklyGroupMenuItem";
+            this.WeeklyGroupMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.WeeklyGroupMenuItem.Text = "Weekly";
+            this.WeeklyGroupMenuItem.Click += new System.EventHandler(this.WeeklyGroupMenuItem_Click);
+            // 
+            // DailyGroupMenuItem
+            // 
+            this.DailyGroupMenuItem.Name = "DailyGroupMenuItem";
+            this.DailyGroupMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.DailyGroupMenuItem.Text = "Daily";
+            this.DailyGroupMenuItem.Click += new System.EventHandler(this.DailyGroupMenuItem_Click);
             // 
             // CompareViewControl
             // 
@@ -240,5 +268,8 @@
         private System.Windows.Forms.ToolStripMenuItem SendPlannedToOverlayMenuItem;
         private System.Windows.Forms.ToolStripMenuItem SendPerformedToOverlayMenuItem;
         private System.Windows.Forms.ToolStripMenuItem SendAllToOverlayMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem GroupMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem WeeklyGroupMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem DailyGroupMenuItem;
     }
 }

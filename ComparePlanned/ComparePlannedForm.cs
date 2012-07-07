@@ -19,8 +19,8 @@ namespace CompareView
     public partial class CompareViewControl : UserControl
     {
         ITheme m_visualTheme;
-        List<CVTreeListEntry> m_CVTreeListEntries = new List<CVTreeListEntry>();
-        List<TreeList.TreeListNode> m_CVWeeklyTreeListNodes = new List<TreeList.TreeListNode>();
+        //List<CVTreeListEntry> m_CVTreeListEntries = new List<CVTreeListEntry>();
+        List<TreeList.TreeListNode> m_CVTreeListNodes = new List<TreeList.TreeListNode>();
 
         Guid ActivityReportsViewGuid = new Guid("99498256-cf51-11db-9705-005056c00008");
         Guid DailyActivityViewGuid = new Guid("1dc82ca0-88aa-45a5-a6c6-c25f56ad1fc3"); 
@@ -155,10 +155,11 @@ namespace CompareView
 
         public void UpdateData()
         {
+
             if (Plugin.GetApplication().Logbook != null)
             {
                 // Enter planned and actual activities into appropriate row elements
-                m_CVTreeListEntries.Clear();
+                m_CVTreeListNodes.Clear();
                 List<IActivity> activities = new List<IActivity>(Plugin.GetApplication().Logbook.Activities);
                 activities.Sort(new ActivityComparer());
                 CVTreeListEntry entry = null;
@@ -171,7 +172,7 @@ namespace CompareView
                         !boPlannedActivity && entry.Activity != null)
                     {
                         if (entry != null)
-                            m_CVTreeListEntries.Add(entry);
+                            m_CVTreeListNodes.Add(new TreeList.TreeListNode(null, entry));
 
                         entry = new CVTreeListEntry();
                         entry.Date = activities[0].StartTime.ToLocalTime().Date;
@@ -185,53 +186,97 @@ namespace CompareView
                     activities.RemoveAt(0);
                 }
                 if (entry != null)
-                    m_CVTreeListEntries.Add(entry);
+                    m_CVTreeListNodes.Add(new TreeList.TreeListNode(null, entry));
                 
-                // Create weekly groups
-                m_CVWeeklyTreeListNodes.Clear();
-                List<CVTreeListEntry> entries = new List<CVTreeListEntry>(m_CVTreeListEntries);
-                CVTreeListEntry wkEntry = null; //entry for the top node containing the week
-                entry = null; //entry for the child node containing the individual workouts
-                TreeList.TreeListNode node = null;
-                while (entries.Count > 0)
+                //If chosen, create daily groups
+                if (Settings.boGroupDaily)
                 {
-                    if (node != null)
-                        wkEntry = (CVTreeListEntry)node.Element;
-                    else
-                        wkEntry = null;
-
-                    if (wkEntry == null ||
-                        GetWeekOfYear(wkEntry.Date) != GetWeekOfYear(entries[0].Date) ||
-                        wkEntry.Date.Year != entries[0].Date.Year)
+                    //List<CVTreeListEntry> entries = new List<CVTreeListEntry>(CVTreeListEntries);
+                    List<TreeList.TreeListNode> nodes = new List<TreeList.TreeListNode>(m_CVTreeListNodes);
+                    m_CVTreeListNodes.Clear();
+                    CVTreeListEntry dayEntry = null; //entry for the top node containing the week
+                    entry = null; //entry for the child node containing the individual workouts
+                    TreeList.TreeListNode node = null;
+                    while (nodes.Count > 0)
                     {
-                        if (wkEntry != null)
-                            m_CVWeeklyTreeListNodes.Add(node);
+                        if (node != null)
+                            dayEntry = (CVTreeListEntry)node.Element;
+                        else
+                            dayEntry = null;
 
-                        wkEntry = new CVTreeListEntry();
+                        entry = (CVTreeListEntry)nodes[0].Element;
+                        if (dayEntry == null ||
+                            !dayEntry.Date.Equals(entry.Date))
+                        {
+                            if (dayEntry != null)
+                                m_CVTreeListNodes.Add(node);
 
-                        wkEntry.Date = GetFirstDayOfWeek(entries[0].Date);
-                        //wkEntry.Date = entries[0].Date; //TODO: Enter the first day of the week here instead!
-                        node = new TreeList.TreeListNode(null, wkEntry);
+                            dayEntry = new CVTreeListEntry();
+
+                            dayEntry.Date = entry.Date;
+                            //dayEntry.Date = entries[0].Date; //TODO: Enter the first day of the week here instead!
+                            node = new TreeList.TreeListNode(null, dayEntry);
+                        }
+                        nodes[0].Parent = node;
+                        node.Children.Add(nodes[0]);
+                        nodes.RemoveAt(0);
                     }
-                    entry = entries[0];
-                    node.Children.Add(new TreeList.TreeListNode(node, entry));
-                    entries.RemoveAt(0);
+                    if (dayEntry != null)
+                        m_CVTreeListNodes.Add(node);
                 }
-                if (wkEntry != null)
-                    m_CVWeeklyTreeListNodes.Add(node);
-                
+
+                if (Settings.boGroupWeekly)
+                {
+                    // Create weekly groups
+                    List<TreeList.TreeListNode> nodes = new List<TreeList.TreeListNode>(m_CVTreeListNodes);
+                    //List<CVTreeListEntry> entries = new List<CVTreeListEntry>(CVTreeListEntries);
+                    m_CVTreeListNodes.Clear();
+                    CVTreeListEntry wkEntry = null; //entry for the top node containing the week
+                    entry = null; //entry for the child node containing the individual workouts
+                    TreeList.TreeListNode node = null;
+                    while (nodes.Count > 0)
+                    {
+                        if (node != null)
+                            wkEntry = (CVTreeListEntry)node.Element;
+                        else
+                            wkEntry = null;
+
+                        entry = (CVTreeListEntry)nodes[0].Element;
+                        if (wkEntry == null ||
+                            GetWeekOfYear(wkEntry.Date) != GetWeekOfYear(entry.Date) ||
+                            wkEntry.Date.Year != entry.Date.Year)
+                        {
+                            if (wkEntry != null)
+                                m_CVTreeListNodes.Add(node);
+
+                            wkEntry = new CVTreeListEntry();
+
+                            wkEntry.Date = GetFirstDayOfWeek(entry.Date);
+                            //dayEntry.Date = entries[0].Date; //TODO: Enter the first day of the week here instead!
+                            node = new TreeList.TreeListNode(null, wkEntry);
+                        }
+                        nodes[0].Parent = node;
+                        node.Children.Add(nodes[0]);
+                        nodes.RemoveAt(0);
+                    }
+                    if (wkEntry != null)
+                        m_CVTreeListNodes.Add(node);
+                }
+
                 // Insert results into the TreeList
-                CompareTreeList.RowData = m_CVWeeklyTreeListNodes;
-                //CompareTreeList.Expanded = m_CVWeeklyTreeListNodes;
+                CompareTreeList.RowData = m_CVTreeListNodes;
+                if (Settings.boExpanded)
+                    ExpandAllMenuItem_Click(null, null);
+                //CompareTreeList.Expanded = m_CVTreeListNodes;
 
                 DateTime calenderDT = Plugin.GetApplication().Calendar.Selected;
-                ShowBestEntryForDate(m_CVWeeklyTreeListNodes, calenderDT);
+                ShowBestEntryForDate(m_CVTreeListNodes, calenderDT);
 
                 //// Use ST calender as a base to know what date the user is interested in
                 //DateTime calenderDT = Plugin.GetApplication().Calendar.Selected;
-                //for (int i = m_CVWeeklyTreeListNodes.Count - 1; i >= 0; i--)
+                //for (int i = m_CVTreeListNodes.Count - 1; i >= 0; i--)
                 //{
-                //    TreeList.TreeListNode tn = m_CVWeeklyTreeListNodes[i];
+                //    TreeList.TreeListNode tn = m_CVTreeListNodes[i];
                 //    if (tn.Element != null)
                 //    {
                 //        entry = (CVTreeListEntry)tn.Element;
@@ -276,16 +321,35 @@ namespace CompareView
             }
         }
 
+        private void ExpandNode(IList<TreeList.TreeListNode> expandedNodes, TreeList.TreeListNode node)
+        {
+            expandedNodes.Add(node);
+            foreach (TreeList.TreeListNode child in node.Children)
+            {
+                ExpandNode(expandedNodes, child);
+            }
+        }
+        
         private void ExpandAllMenuItem_Click(object sender, EventArgs e)
         {
-            CompareTreeList.Expanded = m_CVWeeklyTreeListNodes;
-            CompareTreeList.EnsureVisible(CompareTreeList.SelectedItems[0]);
+            //CompareTreeList.Expanded = m_CVTreeListNodes;
+            List<TreeList.TreeListNode> expandedNodes = new List<TreeList.TreeListNode>();
+            foreach (TreeList.TreeListNode node in m_CVTreeListNodes)
+            {
+                ExpandNode(expandedNodes, node);
+            } 
+            CompareTreeList.Expanded = expandedNodes;
+            if (CompareTreeList.SelectedItems.Count > 0)
+                CompareTreeList.EnsureVisible(CompareTreeList.SelectedItems[0]);
+            Settings.boExpanded = true;
         }
 
         private void CollapseAllMenuItem_Click(object sender, EventArgs e)
         {
             CompareTreeList.Expanded = new List<object>();
-            CompareTreeList.EnsureVisible(CompareTreeList.SelectedItems[0]);
+            if (CompareTreeList.SelectedItems.Count > 0)
+                CompareTreeList.EnsureVisible(CompareTreeList.SelectedItems[0]);
+            Settings.boExpanded = false;
         }
 
         private void CompareTLMenuStrip_Opening(object sender, CancelEventArgs e)
@@ -391,6 +455,26 @@ namespace CompareView
                 MessageBox.Show("Problem when starting Overlay: "+ex.Message );
             }
             
+        }
+
+        private void WeeklyGroupMenuItem_Click(object sender, EventArgs e)
+        {
+            Settings.boGroupWeekly = !Settings.boGroupWeekly;
+            UpdateData();
+            //this.Refresh();
+        }
+
+        private void DailyGroupMenuItem_Click(object sender, EventArgs e)
+        {
+            Settings.boGroupDaily = !Settings.boGroupDaily;
+            UpdateData();
+            //this.Refresh();
+        }
+
+        private void GroupMenuItem_DropDownOpening(object sender, EventArgs e)
+        {
+            WeeklyGroupMenuItem.Checked = Settings.boGroupWeekly;
+            DailyGroupMenuItem.Checked = Settings.boGroupDaily;
         }
     }
 
