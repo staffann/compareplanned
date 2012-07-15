@@ -51,6 +51,10 @@ namespace CompareView
             this.CompareTreeList = new ZoneFiveSoftware.Common.Visuals.TreeList();
             this.CompareTLMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.TableSettingsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.GroupMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.MonthlyGroupMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.WeeklyGroupMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.DailyGroupMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ExpandAllMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.CollapseAllMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.GoToMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -60,9 +64,7 @@ namespace CompareView
             this.SendPlannedToOverlayMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.SendPerformedToOverlayMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.SendAllToOverlayMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.GroupMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.WeeklyGroupMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.DailyGroupMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.YearlyGroupMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.MainSplitContainer.Panel1.SuspendLayout();
             this.MainSplitContainer.Panel2.SuspendLayout();
             this.MainSplitContainer.SuspendLayout();
@@ -157,6 +159,39 @@ namespace CompareView
             this.TableSettingsMenuItem.Text = "Table settings";
             this.TableSettingsMenuItem.Click += new System.EventHandler(this.tableSettingsMenuItem_Click);
             // 
+            // GroupMenuItem
+            // 
+            this.GroupMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.YearlyGroupMenuItem,
+            this.MonthlyGroupMenuItem,
+            this.WeeklyGroupMenuItem,
+            this.DailyGroupMenuItem});
+            this.GroupMenuItem.Name = "GroupMenuItem";
+            this.GroupMenuItem.Size = new System.Drawing.Size(157, 22);
+            this.GroupMenuItem.Text = "Group";
+            this.GroupMenuItem.DropDownOpening += new System.EventHandler(this.GroupMenuItem_DropDownOpening);
+            // 
+            // MonthlyGroupMenuItem
+            // 
+            this.MonthlyGroupMenuItem.Name = "MonthlyGroupMenuItem";
+            this.MonthlyGroupMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.MonthlyGroupMenuItem.Text = "Monthly";
+            this.MonthlyGroupMenuItem.Click += new System.EventHandler(this.MonthlyGroupMenuItem_Click);
+            // 
+            // WeeklyGroupMenuItem
+            // 
+            this.WeeklyGroupMenuItem.Name = "WeeklyGroupMenuItem";
+            this.WeeklyGroupMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.WeeklyGroupMenuItem.Text = "Weekly";
+            this.WeeklyGroupMenuItem.Click += new System.EventHandler(this.WeeklyGroupMenuItem_Click);
+            // 
+            // DailyGroupMenuItem
+            // 
+            this.DailyGroupMenuItem.Name = "DailyGroupMenuItem";
+            this.DailyGroupMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.DailyGroupMenuItem.Text = "Daily";
+            this.DailyGroupMenuItem.Click += new System.EventHandler(this.DailyGroupMenuItem_Click);
+            // 
             // ExpandAllMenuItem
             // 
             this.ExpandAllMenuItem.Name = "ExpandAllMenuItem";
@@ -225,29 +260,12 @@ namespace CompareView
             this.SendAllToOverlayMenuItem.Text = "All";
             this.SendAllToOverlayMenuItem.Click += new System.EventHandler(this.SendToOverlayMenuItem_Click);
             // 
-            // GroupMenuItem
+            // YearlyGroupMenuItem
             // 
-            this.GroupMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.WeeklyGroupMenuItem,
-            this.DailyGroupMenuItem});
-            this.GroupMenuItem.Name = "GroupMenuItem";
-            this.GroupMenuItem.Size = new System.Drawing.Size(157, 22);
-            this.GroupMenuItem.Text = "Group";
-            this.GroupMenuItem.DropDownOpening += new System.EventHandler(this.GroupMenuItem_DropDownOpening);
-            // 
-            // WeeklyGroupMenuItem
-            // 
-            this.WeeklyGroupMenuItem.Name = "WeeklyGroupMenuItem";
-            this.WeeklyGroupMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.WeeklyGroupMenuItem.Text = "Weekly";
-            this.WeeklyGroupMenuItem.Click += new System.EventHandler(this.WeeklyGroupMenuItem_Click);
-            // 
-            // DailyGroupMenuItem
-            // 
-            this.DailyGroupMenuItem.Name = "DailyGroupMenuItem";
-            this.DailyGroupMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.DailyGroupMenuItem.Text = "Daily";
-            this.DailyGroupMenuItem.Click += new System.EventHandler(this.DailyGroupMenuItem_Click);
+            this.YearlyGroupMenuItem.Name = "YearlyGroupMenuItem";
+            this.YearlyGroupMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.YearlyGroupMenuItem.Text = "Yearly";
+            this.YearlyGroupMenuItem.Click += new System.EventHandler(this.YearlyGroupMenuItem_Click);
             // 
             // CompareViewControl
             // 
@@ -287,5 +305,7 @@ namespace CompareView
         private System.Windows.Forms.ToolStripMenuItem GroupMenuItem;
         private System.Windows.Forms.ToolStripMenuItem WeeklyGroupMenuItem;
         private System.Windows.Forms.ToolStripMenuItem DailyGroupMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem MonthlyGroupMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem YearlyGroupMenuItem;
     }
 }

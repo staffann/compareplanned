@@ -27,6 +27,8 @@ namespace CompareView
 
         public static bool boGroupDaily = false;
         public static bool boGroupWeekly = true;
+        public static bool boGroupMonthly = false;
+        public static bool boGroupYearly = false;
         public static bool boExpanded = false;
         
         private static IList<string> m_CompareTreeListColumns = new List<string>();
@@ -64,7 +66,9 @@ namespace CompareView
                     m_CompareTreeListColumns.Add(column);
                 }
             }
-            
+
+            bool.TryParse(pluginNode.GetAttribute("GroupYearly"), out boGroupYearly);
+            bool.TryParse(pluginNode.GetAttribute("GroupMonthly"), out boGroupMonthly);
             bool.TryParse(pluginNode.GetAttribute("GroupWeekly"), out boGroupWeekly);
             bool.TryParse(pluginNode.GetAttribute("GroupDaily"), out boGroupDaily);
             bool.TryParse(pluginNode.GetAttribute("Expanded"), out boExpanded);
@@ -82,6 +86,8 @@ namespace CompareView
                     colText += ";" + column;
             }
             pluginNode.SetAttribute("ListColumns", colText);
+            pluginNode.SetAttribute("GroupYearly", boGroupYearly.ToString());
+            pluginNode.SetAttribute("GroupMonthly", boGroupMonthly.ToString());
             pluginNode.SetAttribute("GroupWeekly", boGroupWeekly.ToString());
             pluginNode.SetAttribute("GroupDaily", boGroupDaily.ToString());
             pluginNode.SetAttribute("Expanded", boExpanded.ToString());

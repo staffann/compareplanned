@@ -19,6 +19,8 @@ using System.Collections.Generic;
 using System.Text;
 using System.Drawing;
 using ZoneFiveSoftware.Common.Visuals;
+using ZoneFiveSoftware.Common.Data.Fitness;
+using ZoneFiveSoftware.Common.Data.Fitness.CustomData;
 using CompareView.Properties;
 
 namespace CompareView
@@ -126,7 +128,16 @@ namespace CompareView
         //public const string AvgPowerDiff = "AveragePowerDiff";
         //public const string AvgCadDiff = "AverageCadenceDiff";
 
-        public static ICollection<IListColumnDefinition> ColumnDefs()
+        public static ICollection<IListColumnDefinition> ColumnDefs
+        {
+            get
+            {
+                return ColumnCustomDataDefs(ColumnStaticDefs());
+            }
+        }
+
+        
+        private static ICollection<IListColumnDefinition> ColumnStaticDefs()
         {
             IList<IListColumnDefinition> columnDefs = new List<IListColumnDefinition>();
             columnDefs.Add(new CompareTreeListColumnDefinition(CompareColumnIds.StartTime, CommonResources.Text.LabelDate, "", 100, StringAlignment.Near));
@@ -154,5 +165,23 @@ namespace CompareView
 
             return columnDefs;
         }
+
+        private static ICollection<IListColumnDefinition> ColumnCustomDataDefs(ICollection<IListColumnDefinition> inColumnDefs)
+        {
+            IList<IListColumnDefinition> columnDefs = new List<IListColumnDefinition>(inColumnDefs);
+            ILogbook logbook = Plugin.GetApplication().Logbook;
+            if (logbook != null)
+            {
+                foreach (ICustomDataFieldDefinition customDT in logbook.CustomDataFieldDefinitions)
+                {
+                    CompareTreeListColumnDefinition customDef = new CompareTreeListColumnDefinition("CustomDataField"+customDT.Id.ToString(), customDT.Name, "CustomDataFields", 70, StringAlignment.Near);
+                    columnDefs.Add(customDef);
+                    customDef = new CompareTreeListColumnDefinition("PlannedCustomDataField" + customDT.Id.ToString(), Resources.Planned + " " + customDT.Name, Resources.Planned + " " + "CustomDataFields", 70, StringAlignment.Near);
+                    columnDefs.Add(customDef);
+                }
+            }
+            return columnDefs;
+        }
+
     }
 }

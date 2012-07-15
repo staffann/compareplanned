@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Text;
 using ZoneFiveSoftware.Common.Visuals;
 using ZoneFiveSoftware.Common.Data.Fitness;
+using ZoneFiveSoftware.Common.Data.Fitness.CustomData;
 using ZoneFiveSoftware.Common.Data.Measurement;
 
 namespace CompareView
@@ -129,6 +130,36 @@ namespace CompareView
                     TreeList.TreeListNode plannedNode = TransformPlannedToActual(node, (TreeList.TreeListNode)node.Parent);
                     return GetText(plannedNode, new TreeList.Column(column.Id.Replace("Planned", "")));
                 }
+            }
+            else if (column.Id.Contains("CustomDataField"))
+            {
+                if (entry.Activity != null)
+                {
+                    Guid custDataFieldId = new Guid(column.Id.Replace("CustomDataField", ""));
+                    ILogbook logbook = Plugin.GetApplication().Logbook;
+                    if (logbook != null)
+                    {
+                        foreach (ICustomDataFieldDefinition customDF in logbook.CustomDataFieldDefinitions)
+                        {
+                            if (customDF.Id.Equals(custDataFieldId))
+                            {
+                                if (entry.Activity != null)
+                                {
+                                    object custDataValueObject = entry.Activity.GetCustomDataValue(customDF);
+                                    if (object.ReferenceEquals(custDataValueObject.GetType(), typeof(double)))
+                                    {
+                                        return (custDataValueObject as double?).Value.ToString("0.00");
+                                    }
+                                    else
+                                    {
+                                        return entry.Activity.GetCustomDataValue(customDF).ToString();
+                                    }
+                                }
+                            }
+                        }
+                    }                    
+                }
+                return "";
             }
             else if (column.Id.Equals("StartTime"))
             {

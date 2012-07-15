@@ -135,7 +135,7 @@ namespace CompareView
             CompareTreeList.Columns.Clear();
             foreach (string id in Settings.CompareTreeListColumns)
             {
-                foreach (IListColumnDefinition columnDef in CompareColumnIds.ColumnDefs())
+                foreach (IListColumnDefinition columnDef in CompareColumnIds.ColumnDefs)
                 {
                     if (columnDef.Id == id)
                     {
@@ -270,6 +270,80 @@ namespace CompareView
                         m_CVTreeListNodes.Add(node);
                 }
 
+                //If chosen, create monthly groups
+                if (Settings.boGroupMonthly)
+                {
+                    List<TreeList.TreeListNode> nodes = new List<TreeList.TreeListNode>(m_CVTreeListNodes);
+                    m_CVTreeListNodes.Clear();
+                    CVTreeListEntry monEntry = null; //entry for the top node containing the week
+                    entry = null; //entry for the child node containing the individual workouts
+                    TreeList.TreeListNode node = null;
+                    while (nodes.Count > 0)
+                    {
+                        if (node != null)
+                            monEntry = (CVTreeListEntry)node.Element;
+                        else
+                            monEntry = null;
+
+                        entry = (CVTreeListEntry)nodes[0].Element;
+                        if (monEntry == null ||
+                            monEntry.Date.Month != entry.Date.Month ||
+                            monEntry.Date.Year != entry.Date.Year)
+                        {
+                            if (monEntry != null)
+                                m_CVTreeListNodes.Add(node);
+
+                            monEntry = new CVTreeListEntry();
+
+                            monEntry.Date = entry.Date;
+                            monEntry.Date = monEntry.Date.Subtract(new TimeSpan(monEntry.Date.Day - 1, 0, 0, 0));
+                            node = new TreeList.TreeListNode(null, monEntry);
+                        }
+                        nodes[0].Parent = node;
+                        node.Children.Add(nodes[0]);
+                        nodes.RemoveAt(0);
+                    }
+                    if (monEntry != null)
+                        m_CVTreeListNodes.Add(node);
+                }
+
+                //If chosen, create yearly groups
+                if (Settings.boGroupYearly)
+                {
+                    List<TreeList.TreeListNode> nodes = new List<TreeList.TreeListNode>(m_CVTreeListNodes);
+                    m_CVTreeListNodes.Clear();
+                    CVTreeListEntry yearEntry = null; //entry for the top node containing the week
+                    entry = null; //entry for the child node containing the individual workouts
+                    TreeList.TreeListNode node = null;
+                    while (nodes.Count > 0)
+                    {
+                        if (node != null)
+                            yearEntry = (CVTreeListEntry)node.Element;
+                        else
+                            yearEntry = null;
+
+                        entry = (CVTreeListEntry)nodes[0].Element;
+                        if (yearEntry == null ||
+                            yearEntry.Date.Year != entry.Date.Year)
+                        {
+                            if (yearEntry != null)
+                                m_CVTreeListNodes.Add(node);
+
+                            yearEntry = new CVTreeListEntry();
+
+                            yearEntry.Date = entry.Date;
+                            yearEntry.Date = new DateTime(yearEntry.Date.Year, 1, 1);
+                            node = new TreeList.TreeListNode(null, yearEntry);
+                        }
+                        nodes[0].Parent = node;
+                        node.Children.Add(nodes[0]);
+                        nodes.RemoveAt(0);
+                    }
+                    if (yearEntry != null)
+                        m_CVTreeListNodes.Add(node);
+                }
+
+                
                 // Insert results into the TreeList
                 CompareTreeList.RowData = m_CVTreeListNodes;
                 if (Settings.boExpanded)
@@ -296,7 +370,7 @@ namespace CompareView
         private void tableSettingsMenuItem_Click(object sender, EventArgs e)
         {
             ListSettingsDialog dialog = new ListSettingsDialog();
-            dialog.AvailableColumns = CompareColumnIds.ColumnDefs();
+            dialog.AvailableColumns = CompareColumnIds.ColumnDefs;
             dialog.ThemeChanged(m_visualTheme);
             dialog.AllowFixedColumnSelect = false;
             dialog.SelectedColumns = Settings.CompareTreeListColumns;
@@ -446,6 +520,18 @@ namespace CompareView
             
         }
 
+        private void YearlyGroupMenuItem_Click(object sender, EventArgs e)
+        {
+            Settings.boGroupYearly = !Settings.boGroupYearly;
+            UpdateData();
+        }
+
+        private void MonthlyGroupMenuItem_Click(object sender, EventArgs e)
+        {
+            Settings.boGroupMonthly = !Settings.boGroupMonthly;
+            UpdateData();
+        }
+
         private void WeeklyGroupMenuItem_Click(object sender, EventArgs e)
         {
             Settings.boGroupWeekly = !Settings.boGroupWeekly;
@@ -460,9 +546,13 @@ namespace CompareView
 
         private void GroupMenuItem_DropDownOpening(object sender, EventArgs e)
         {
+            YearlyGroupMenuItem.Checked = Settings.boGroupYearly;
+            MonthlyGroupMenuItem.Checked = Settings.boGroupMonthly;
             WeeklyGroupMenuItem.Checked = Settings.boGroupWeekly;
             DailyGroupMenuItem.Checked = Settings.boGroupDaily;
         }
+
+
     }
 
 
