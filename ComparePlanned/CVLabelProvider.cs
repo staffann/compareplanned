@@ -28,6 +28,65 @@ namespace CompareView
     {        
         #region ILabelProvider Members
 
+        private object GetCustomDataFieldValue(TreeList.TreeListNode node, ICustomDataFieldDefinition customDF)
+        {
+            CVTreeListEntry entry = (CVTreeListEntry)node.Element;
+            object custDataValue = null;
+
+            // If the node has children, calculate the value from the children. Note that they might have tp be be summed, averaged etc.
+            if (customDF.DataType.Id.Equals(CustomDataFieldDefinitions.StandardDataTypes.NumberDataTypeId) &&
+                node.Children.Count > 0)
+            {
+                double? numCustDataValue = null;
+                int totAct = 0;
+                TimeSpan totTime = new TimeSpan();
+                foreach (TreeList.TreeListNode child in node.Children)
+                {
+                    double? childDataValue = GetCustomDataFieldValue(child, customDF) as double?;
+                    if (childDataValue != null)
+                    {
+                        totAct++;
+                        TimeSpan actTime = ActivityInfoCache.Instance.GetInfo((child.Element as CVTreeListEntry).Activity).Time;
+                        totTime.Add(actTime);
+                        if (numCustDataValue != null)
+                        {
+                            if (customDF.GroupAggregation.Equals(CustomDataFieldGroupAggregation.AggregationType.Sum))
+                                numCustDataValue += childDataValue;
+                            else if (customDF.GroupAggregation.Equals(CustomDataFieldGroupAggregation.AggregationType.Average))
+                                numCustDataValue = (numCustDataValue * (totAct - 1) + childDataValue) / (totAct);
+                            else if (customDF.GroupAggregation.Equals(CustomDataFieldGroupAggregation.AggregationType.TimeWeightedAverage))
+                                numCustDataValue = (numCustDataValue * (totTime.TotalSeconds - actTime.TotalSeconds) + childDataValue * actTime.TotalSeconds) / totTime.TotalSeconds;
+                            else if (customDF.GroupAggregation.Equals(CustomDataFieldGroupAggregation.AggregationType.Count))
+                                numCustDataValue += 1;
+                            else if (customDF.GroupAggregation.Equals(CustomDataFieldGroupAggregation.AggregationType.Maximum))
+                                numCustDataValue = Math.Max(numCustDataValue.Value, childDataValue.Value);
+                            else if (customDF.GroupAggregation.Equals(CustomDataFieldGroupAggregation.AggregationType.Minimum))
+                                numCustDataValue = Math.Min(numCustDataValue.Value, childDataValue.Value);
+                            else if (customDF.GroupAggregation.Equals(CustomDataFieldGroupAggregation.AggregationType.First))
+                                { } // Do not do anything after the first value has been assigned
+                            else if (customDF.GroupAggregation.Equals(CustomDataFieldGroupAggregation.AggregationType.Last))
+                                numCustDataValue = childDataValue;
+                            else
+                                numCustDataValue = null;
+                        }
+                        else
+                        {
+                            numCustDataValue = childDataValue;
+                        }
+                    }
+                }
+                custDataValue = numCustDataValue;
+            }
+            else if (entry.Activity != null)
+            {
+                custDataValue = entry.Activity.GetCustomDataValue(customDF);
+            }
+            else
+            {
+            }
+            return custDataValue;
+        }
+        
         private TimeSpan? GetTime(TreeList.TreeListNode node)
         {
             CVTreeListEntry entry = (CVTreeListEntry)node.Element;
@@ -133,31 +192,28 @@ namespace CompareView
             }
             else if (column.Id.Contains("CustomDataField"))
             {
-                if (entry.Activity != null)
+                Guid custDataFieldId = new Guid(column.Id.Replace("CustomDataField", ""));
+                ILogbook logbook = Plugin.GetApplication().Logbook;
+                if (logbook != null)
                 {
-                    Guid custDataFieldId = new Guid(column.Id.Replace("CustomDataField", ""));
-                    ILogbook logbook = Plugin.GetApplication().Logbook;
-                    if (logbook != null)
+                    foreach (ICustomDataFieldDefinition customDF in logbook.CustomDataFieldDefinitions)
                     {
-                        foreach (ICustomDataFieldDefinition customDF in logbook.CustomDataFieldDefinitions)
+                        if (customDF.Id.Equals(custDataFieldId))
                         {
-                            if (customDF.Id.Equals(custDataFieldId))
+                            object custDataValueObject = GetCustomDataFieldValue(node, customDF);
+                            if (custDataValueObject != null)
                             {
-                                if (entry.Activity != null)
+                                if (object.ReferenceEquals(custDataValueObject.GetType(), typeof(double)))
                                 {
-                                    object custDataValueObject = entry.Activity.GetCustomDataValue(customDF);
-                                    if (object.ReferenceEquals(custDataValueObject.GetType(), typeof(double)))
-                                    {
-                                        return (custDataValueObject as double?).Value.ToString("0.00");
-                                    }
-                                    else
-                                    {
-                                        return entry.Activity.GetCustomDataValue(customDF).ToString();
-                                    }
+                                    return (custDataValueObject as double?).Value.ToString("0.00");
+                                }
+                                else
+                                {
+                                    return entry.Activity.GetCustomDataValue(customDF).ToString();
                                 }
                             }
                         }
-                    }                    
+                    }
                 }
                 return "";
             }
