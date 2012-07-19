@@ -367,6 +367,12 @@ namespace CompareView
             #endregion
         }
 
+        public void FormHidden()
+        {
+            Plugin.GetApplication().Calendar.SetMarkedDates(new List<DateTime>()); //Hide the dates of planned activities in the ST calendar
+            Plugin.GetApplication().Calendar.SetHighlightedDates(new List<DateTime>()); //Hide the dates of performed activities in the ST calendar            
+        }
+
         private void tableSettingsMenuItem_Click(object sender, EventArgs e)
         {
             ListSettingsDialog dialog = new ListSettingsDialog();

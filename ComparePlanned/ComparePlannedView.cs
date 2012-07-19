@@ -79,6 +79,8 @@ namespace CompareView
 
         public bool HidePage()
         {
+            control.FormHidden();
+            Plugin.GetApplication().PropertyChanged -= new PropertyChangedEventHandler(UpdateControlEventHandler);
             return true;
         }
 
@@ -123,7 +125,8 @@ namespace CompareView
 
         private void UpdateControlEventHandler(object sender, EventArgs e)
         {
-            control.UpdateData();
+            if (control != null)
+                control.UpdateData();
         }
 
     }
