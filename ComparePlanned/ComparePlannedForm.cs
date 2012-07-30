@@ -169,7 +169,7 @@ namespace CompareView
                 {
                     bool boPlannedActivity = PlannedActivity(activities[0].Category);
                     if (entry == null ||
-                        !entry.Date.ToLocalTime().Date.Equals(activities[0].StartTime.Date) ||
+                        !entry.Date.Date.Equals(activities[0].StartTime.ToLocalTime().Date) ||
                         boPlannedActivity && entry.PlannedActivity != null ||
                         !boPlannedActivity && entry.Activity != null)
                     {
