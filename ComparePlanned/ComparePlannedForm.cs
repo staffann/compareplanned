@@ -41,6 +41,22 @@ namespace CompareView
         Guid DailyActivityViewGuid = new Guid("1dc82ca0-88aa-45a5-a6c6-c25f56ad1fc3"); 
         private string MyActivitiesCatRefId = "fa756214-cf71-11db-9705-005056c00008";
 
+        private void GetActivities(TreeList.TreeListNode node, bool boPlanned, bool boPerformed, IList<IActivity> actList)
+        {
+            CVTreeListEntry entry = (CVTreeListEntry)node.Element;
+
+            if (boPlanned && entry.PlannedActivity != null && !actList.Contains(entry.PlannedActivity))
+                actList.Add(entry.PlannedActivity);
+            if (boPerformed && entry.Activity != null && !actList.Contains(entry.Activity))
+                actList.Add(entry.Activity);
+            
+            // If the node has children, handle them too
+            foreach (TreeList.TreeListNode child in node.Children)
+            {
+                GetActivities(child, boPlanned, boPerformed, actList);
+            }
+        }
+        
         private bool PlannedActivity(IActivityCategory actCat)
         {
             while (actCat.Parent != null)
@@ -449,7 +465,7 @@ namespace CompareView
                     }
                 }
             }
-            if (OverlayLoaded && (GoToPlannedMenuItem.Enabled ||GoToPerformedMenuItem.Enabled))
+            if (OverlayLoaded) //&& (GoToPlannedMenuItem.Enabled ||GoToPerformedMenuItem.Enabled))
             {
                 SendToOverlayMenuItem.Enabled = true;
             }
@@ -496,11 +512,7 @@ namespace CompareView
 
             foreach (TreeList.TreeListNode tn in CompareTreeList.SelectedItems)
             {
-                CVTreeListEntry entry = (CVTreeListEntry)tn.Element;
-                if (includePlanned && entry.PlannedActivity != null)
-                    actList.Add(entry.PlannedActivity);
-                if (includePerformed && entry.Activity != null)
-                    actList.Add(entry.Activity);
+                GetActivities(tn, includePlanned, includePerformed, actList);
             }
 
             try
